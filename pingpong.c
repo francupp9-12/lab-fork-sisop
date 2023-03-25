@@ -30,10 +30,10 @@ main(void)
 	if (pipe2 < 0) {
 		printf("Error en el segundo pipe");
 	}
-	printf("Hola, soy PID %d\n",
+	printf("Hola, soy PID %d:",
 	       getpid());  //  Por ahora tengo un único proceso
-	printf("    - El primer pipe me devuelve [%d, %d]\n", fds1[0], fds1[1]);
-	printf("    - El segundo pipe me devuelve [%d, %d]\n", fds2[0], fds2[1]);
+	printf("    - primer pipe me devuelve [%d, %d]\n", fds1[0], fds1[1]);
+	printf("    - segundo pipe me devuelve [%d, %d]\n", fds2[0], fds2[1]);
 
 	int i = fork();
 	if (i < 0) {
