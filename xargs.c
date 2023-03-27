@@ -1,62 +1,62 @@
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
-#include <stdbool.h>
-#include <time.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+#include <string.h>
 
 #ifndef NARGS
 #define NARGS 4
 #endif
 
+
+void fork_proccess(char *commands[]);
+
+void
+fork_proccess(char *commands[])
+{
+    pid_t pidC;
+    pidC = fork();
+    if (pidC < 0) {
+        perror("Error en el fork");
+    }
+
+    if (pidC > 0) {
+        wait(NULL);
+    } else if (pidC == 0) {
+        execvp(commands[0], commands);
+    }
+}
+
 int
 main(int argc, char *argv[])
 {
-	if (argc < 2) {
-		perror("No recibió un comando");
-		return -1;
-	}
-	char *path = argv[1];
-	int counter = 0;
-	size_t tam = 0;
-	char **arguments = calloc(NARGS + 2, sizeof(char *));
-	arguments[0] = path;
-	arguments[NARGS + 1] = NULL;  // Termino en NULL
-	bool is_reading = true;
-	while (is_reading) {
-		char *line = NULL;
-		int read = getline(&line, &tam, stdin);
-		if (read != -1) {
-			counter++;
-			arguments[counter] = strtok(line, "\n");
-		} else {
-			is_reading = false;
-		}
-		if ((counter == NARGS) ||
-		    ((is_reading == false) & (counter != 0))) {
-			counter = 0;
-			int f = fork();
-			if (f < 0) {
-				perror("Error en fork");
-				exit(-1);
-			}
-			if (f == 0) {
-				if (execvp(path, arguments) == -1) {
-					perror("No se pudo ejecutar el "
-					       "comando.");
-					exit(-1);
-				}
-			} else {
-				for (int i = 1; i <= NARGS; i++) {
-					arguments[i] = NULL;
-				}
-				waitpid(f, NULL, 0);
-			}
-		}
-		free(line);
-	}
-	free(arguments);
-	// free(path);
-	exit(0);
+    char *line = NULL;
+    size_t len = 0;
+
+    char *commands[NARGS + 2] = { argv[1], NULL, NULL, NULL, NULL, NULL };
+
+    if (argc < 2) {
+        perror("Cantidad errónea de parámetros");
+        exit(EXIT_FAILURE);
+    }
+
+    int iteracion = 1;
+
+    while (getline(&line, &len, stdin) != -1) {
+        line[strlen(line) - 1] = '\0';
+        commands[iteracion] = strdup(line);
+        if (iteracion == 4) {
+            fork_proccess(commands);
+            iteracion = 0;
+        }
+
+        iteracion++;
+    }
+
+    fork_proccess(commands);
+
+    free(line);
+    exit(EXIT_SUCCESS);
 }
