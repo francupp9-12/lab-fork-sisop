@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-void execute(char *args[]);
+void execute(char *commands[]);
 void clean_commands(char *args[], int i);
 
 void
-execute(char *args[])
+execute(char *commands[])
 {
     int i = fork();
     if (i < 0) {
@@ -20,7 +20,7 @@ execute(char *args[])
     }
 
     if (i == 0) {
-        execvp(args[0], args);
+        execvp(commands[0], commands);
     } else {
         wait(NULL);
     }
@@ -44,23 +44,23 @@ main(int argc, char *argv[])
     size_t len = 0;
     size_t read = 0;
     char *line = NULL;
-    char *args[NARGS + 2] = { argv[1] };
+    char *commands[NARGS + 2] = { argv[1] };
     int n_commands = 1;
     while ((read = getline(&line, &len, stdin) != -1)) {
         if (n_commands == (NARGS + 1)) {  // ya lei NARGS veces
-            args[n_commands] = NULL;
-            execute(args);
-            clean_commands(args, n_commands);
+            commands[n_commands] = NULL;
+            execute(commands);
+            clean_commands(commands, n_commands);
             n_commands = 1;
         }
         line[strlen(line) - 1] = '\0';
-        args[n_commands] = strdup(line);
+        commands[n_commands] = strdup(line);
         n_commands++;
     }
     if (n_commands > 1) {  //
-        args[n_commands] = NULL;
-        execute(args);
-        clean_commands(args, n_commands);
+        commands[n_commands] = NULL;
+        execute(commands);
+        clean_commands(commands, n_commands);
     }
 
     free(line);
