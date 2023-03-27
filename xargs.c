@@ -18,45 +18,45 @@ main(int argc, char *argv[])
 		return -1;
 	}
 	char *path = argv[1];
-	int contador = 0;
+	int counter = 0;
 	size_t tam = 0;
-	char **argumentos = calloc(NARGS + 2, sizeof(char *));
-	argumentos[0] = path;
-	argumentos[NARGS + 1] = NULL;
-	bool hay_mas_lineas = true;
-	while (hay_mas_lineas) {
-		char *linea = NULL;
-		int lectura = getline(&linea, &tam, stdin);
-		if (lectura != -1) {
-			contador++;
-			argumentos[contador] = strtok(linea, "\n");
+	char **arguments = calloc(NARGS + 2, sizeof(char *));
+	arguments[0] = path;
+	arguments[NARGS + 1] = NULL;  // Termino en NULL
+	bool is_reading = true;
+	while (is_reading) {
+		char *line = NULL;
+		int read = getline(&line, &tam, stdin);
+		if (read != -1) {
+			counter++;
+			arguments[counter] = strtok(line, "\n");
 		} else {
-			hay_mas_lineas = false;
+			is_reading = false;
 		}
-		if ((contador == NARGS) ||
-		    ((hay_mas_lineas == false) & (contador != 0))) {
-			contador = 0;
+		if ((counter == NARGS) ||
+		    ((is_reading == false) & (counter != 0))) {
+			counter = 0;
 			int f = fork();
 			if (f < 0) {
 				perror("Error en fork");
 				exit(-1);
 			}
 			if (f == 0) {
-				if (execvp(path, argumentos) == -1) {
+				if (execvp(path, arguments) == -1) {
 					perror("No se pudo ejecutar el "
 					       "comando.");
 					exit(-1);
 				}
 			} else {
 				for (int i = 1; i <= NARGS; i++) {
-					argumentos[i] = NULL;
+					arguments[i] = NULL;
 				}
 				waitpid(f, NULL, 0);
 			}
 		}
-		free(linea);
+		free(line);
 	}
-	free(argumentos);
-	//free(path);
+	free(arguments);
+	// free(path);
 	exit(0);
 }
