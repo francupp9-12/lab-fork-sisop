@@ -12,9 +12,9 @@ void print_common_lines(int fork_result, int pid, int parent_pid);
 void
 print_common_lines(int fork_result, int pid, int parent_pid)
 {
-    printf("Donde fork me devuelve %d:\n", fork_result);
-    printf("	- getpid me devuelve: %d\n", pid);
-    printf("	- getppid me devuelve: %d\n", parent_pid);
+	printf("Donde fork me devuelve %d:\n", fork_result);
+	printf("	- getpid me devuelve: %d\n", pid);
+	printf("	- getppid me devuelve: %d\n", parent_pid);
 }
 
 int
@@ -30,9 +30,9 @@ main(void)
 	if (pipe2 < 0) {
 		printf("Error en el segundo pipe");
 	}
-    printf("Hola, soy PID %d:\n", getpid());
-    printf("	- primer pipe me devuelve: [%d, %d]\n", fds1[0], fds1[1]);
-    printf("	- segundo pipe me devuelve: [%d, %d]\n", fds2[0], fds2[1]);
+	printf("Hola, soy PID %d:\n", getpid());
+	printf("	- primer pipe me devuelve: [%d, %d]\n", fds1[0], fds1[1]);
+	printf("	- segundo pipe me devuelve: [%d, %d]\n", fds2[0], fds2[1]);
 	int i = fork();
 	if (i < 0) {
 		perror("Error en el fork");
@@ -47,13 +47,13 @@ main(void)
 			perror("Error en el pipe al recibir número");
 			exit(-1);
 		}
-        printf("	- recibo valor %d vía fd=%d\n", received, fds1[0]);
+		printf("	- recibo valor %d vía fd=%d\n", received, fds1[0]);
 		close(fds1[0]);
 		if (write(fds2[1], &received, sizeof(received)) < 0) {
 			perror("Error en la escritura");
 			exit(-1);
 		}
-        printf("	- reenvío valor en fd=%d y termino\n", fds2[1]);
+		printf("	- reenvío valor en fd=%d y termino\n", fds2[1]);
 		close(fds2[1]);
 
 	} else {
@@ -66,18 +66,18 @@ main(void)
 			perror("Error en la escritura");
 			exit(-1);
 		}
-        printf("	- random me devuelve: %d\n", rand_num);
-        printf("	- envío valor %d a través de fd= %d\n",
-               rand_num,
-               fds1[1]);
+		printf("	- random me devuelve: %d\n", rand_num);
+		printf("	- envío valor %d a través de fd= %d\n",
+		       rand_num,
+		       fds1[1]);
 		close(fds1[1]);
 		int received = 0;
 		if (read(fds2[0], &received, sizeof(received)) < 0) {
 			perror("Error en la lectura");
 			exit(-1);
 		}
-        printf("Hola, de nuevo PID %d:\n", getpid());
-        printf("	- recibí valor %d vía fd= %d\n", received, fds2[0]);
+		printf("Hola, de nuevo PID %d:\n", getpid());
+		printf("	- recibí valor %d vía fd= %d\n", received, fds2[0]);
 		close(fds2[0]);
 		wait(NULL);
 	}
